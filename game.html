@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reach the Goal - Simple Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            background-color: white;
+            border: 2px solid #333;
+            margin: 0 auto;
+            position: relative;
+            width: 600px;
+            height: 400px;
+            overflow: hidden;
+        }
+        #player {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background-color: blue;
+            border-radius: 5px;
+        }
+        #goal {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            border-radius: 50%;
+        }
+        #instructions {
+            margin: 20px;
+        }
+        #win-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reach the Goal Game</h1>
+    <div id="instructions">
+        <p>Use the arrow keys to move the blue player to the green goal.</p>
+    </div>
+    
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="goal"></div>
+        <div id="win-message">
+            <h2>You Win!</h2>
+            <p>Congratulations! You reached the goal!</p>
+            <button id="play-again">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game elements
+        const player = document.getElementById('player');
+        const goal = document.getElementById('goal');
+        const winMessage = document.getElementById('win-message');
+        const playAgainButton = document.getElementById('play-again');
+        const gameContainer = document.getElementById('game-container');
+        
+        // Player properties
+        let playerX = 50;
+        let playerY = 200;
+        const playerSpeed = 5;
+        const playerWidth = 30;
+        const playerHeight = 50;
+        
+        // Goal properties
+        let goalX = 500;
+        let goalY = 200;
+        const goalSize = 40;
+        
+        // Game state
+        let gameActive = true;
+        
+        // Initialize game
+        function initGame() {
+            // Random goal position (keeping away from edges)
+            goalX = Math.random() * (gameContainer.clientWidth - 100) + 50;
+            goalY = Math.random() * (gameContainer.clientHeight - 100) + 50;
+            
+            // Reset player position
+            playerX = 50;
+            playerY = 200;
+            
+            // Update positions
+            updateGameObjects();
+            
+            // Reset game state
+            gameActive = true;
+            winMessage.style.display = 'none';
+        }
+        
+        // Update game objects on screen
+        function updateGameObjects() {
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+            
+            goal.style.left = goalX + 'px';
+            goal.style.top = goalY + 'px';
+        }
+        
+        // Check for collision between player and goal
+        function checkCollision() {
+            const playerRight = playerX + playerWidth;
+            const playerBottom = playerY + playerHeight;
+            const goalRight = goalX + goalSize;
+            const goalBottom = goalY + goalSize;
+            
+            if (
+                playerX < goalRight &&
+                playerRight > goalX &&
+                playerY < goalBottom &&
+                playerBottom > goalY
+            ) {
+                // Collision detected - player reached the goal
+                gameActive = false;
+                winMessage.style.display = 'block';
+            }
+        }
+        
+        // Handle keyboard input
+        document.addEventListener('keydown', function(event) {
+            if (!gameActive) return;
+            
+            // Move player based on arrow key presses
+            switch (event.key) {
+                case 'ArrowUp':
+                    playerY = Math.max(0, playerY - playerSpeed);
+                    break;
+                case 'ArrowDown':
+                    playerY = Math.min(gameContainer.clientHeight - playerHeight, playerY + playerSpeed);
+                    break;
+                case 'ArrowLeft':
+                    playerX = Math.max(0, playerX - playerSpeed);
+                    break;
+                case 'ArrowRight':
+                    playerX = Math.min(gameContainer.clientWidth - playerWidth, playerX + playerSpeed);
+                    break;
+            }
+            
+            updateGameObjects();
+            checkCollision();
+            
+            // Prevent default behavior (scrolling)
+            event.preventDefault();
+        });
+        
+        // Play again button
+        playAgainButton.addEventListener('click', initGame);
+        
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+</html>
